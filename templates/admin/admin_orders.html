@@ -1,0 +1,190 @@
+{% extends "admin/admin_base.html" %}
+
+{% block admin_content %}
+
+<h2 class="admin-page-title">🛒 Orders</h2>
+
+<div class="row g-4">
+
+    {% for o in orders.items %}
+
+    <div class="col-md-6 col-lg-4">
+
+        <div class="order-card">
+
+            <!-- HEADER -->
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="mb-0">Order #{{ o.id }}</h6>
+                <span class="status {{ o.status }}">{{ o.status }}</span>
+            </div>
+
+            <div class="small text-muted mb-2">
+                ₹{{ o.total_amount }}
+            </div>
+
+            <!-- DETAILS -->
+            <p class="mb-1"><strong>Payment:</strong> {{ o.payment_method }}</p>
+            <p class="mb-1"><strong>Payment ID:</strong> {{ o.payment_id or "-" }}</p>
+
+            <!-- REFUND STATUS -->
+            <p class="mb-1">
+                <strong>Refund:</strong>
+                {% if o.refund_status == "requested" %}
+                <span class="badge bg-warning text-dark">Requested</span>
+                {% elif o.refund_status == "processed" %}
+                <span class="badge bg-success">Refunded</span>
+                {% elif o.refund_status == "failed" %}
+                <span class="badge bg-danger">Failed</span>
+                {% else %}
+                <span class="badge bg-secondary">None</span>
+                {% endif %}
+            </p>
+
+            <!-- COD NOTE -->
+            {% if o.payment_method == "cod" and o.refund_status == "requested" %}
+            <p class="text-warning small mb-1">
+                Manual refund required (COD)
+            </p>
+            {% endif %}
+
+            <!-- REFUND REASON -->
+            {% if o.refund_reason %}
+            <p class="small mb-2"><strong>Reason:</strong> {{ o.refund_reason }}</p>
+            {% endif %}
+
+            <!-- ACTIONS -->
+            <div class="mt-3">
+
+                <!-- APPROVE REFUND -->
+                {% if o.refund_status == 'requested' %}
+                <form method="POST" action="{{ url_for('admin.approve_refund', order_id=o.id) }}">
+                    <button class="btn btn-success btn-sm w-100 mb-2">
+                        Approve Refund
+                    </button>
+                </form>
+                {% endif %}
+
+                <!-- STATUS UPDATE -->
+                {% if o.status != "refunded" %}
+
+                <form method="POST" action="{{ url_for('admin.update_order', order_id=o.id) }}">
+                    <div class="d-flex gap-2">
+
+                        <select name="status" class="form-select form-select-sm">
+                            <option value="placed" {% if o.status=='placed' %}selected{% endif %}>Placed</option>
+                            <option value="shipped" {% if o.status=='shipped' %}selected{% endif %}>Shipped</option>
+                            <option value="delivered" {% if o.status=='delivered' %}selected{% endif %}>Delivered
+                            </option>
+                            <option value="cancelled" {% if o.status=='cancelled' %}selected{% endif %}>Cancelled
+                            </option>
+                        </select>
+
+                        <button class="btn btn-dark btn-sm">
+                            Update
+                        </button>
+
+                    </div>
+                </form>
+
+                {% else %}
+
+                <p class="text-muted small mt-2">Status locked (refunded)</p>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+<!-- PAGINATION -->
+{% if orders.pages > 1 %}
+
+<nav class="mt-4 d-flex justify-content-center">
+
+    <ul class="pagination">
+
+        {% if orders.has_prev %}
+        <li class="page-item">
+            <a class="page-link" href="{{ url_for('admin.all_orders', page=orders.prev_num) }}">
+                Previous
+            </a>
+        </li>
+        {% endif %}
+
+        <li class="page-item disabled">
+            <span class="page-link">
+                Page {{ orders.page }} of {{ orders.pages }}
+            </span>
+        </li>
+
+        {% if orders.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="{{ url_for('admin.all_orders', page=orders.next_num) }}">
+                Next
+            </a>
+        </li>
+        {% endif %}
+
+    </ul>
+
+</nav>
+
+{% endif %}
+
+<!-- STYLE -->
+<style>
+    .order-card {
+        background: white;
+        padding: 18px;
+        border-radius: 14px;
+
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+
+        transition: 0.25s;
+    }
+
+    .order-card:hover {
+        transform: translateY(-5px);
+    }
+
+    /* STATUS COLORS */
+    .status {
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        text-transform: capitalize;
+    }
+
+    .status.placed {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .status.shipped {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+
+    .status.delivered {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status.cancelled {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .status.refunded {
+        background: #eee;
+        color: #555;
+    }
+</style>
+
+{% endblock %}

@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}Profile | CopVizz{% endblock %}
+
+{% block content %}
+
+<div class="container my-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-6">
+
+            <!-- PROFILE CARD -->
+            <div class="profile-card">
+
+                <!-- TOP -->
+                <div class="text-center mb-4">
+
+                    <div class="profile-avatar">👤</div>
+
+                    <h4 class="fw-bold mt-2">
+                        {{ user.name or "User Name" }}
+                    </h4>
+
+                    <p class="text-muted small">
+                        {{ user.email }}
+                    </p>
+
+                </div>
+
+                <!-- DETAILS -->
+                <div class="profile-info">
+
+                    <div class="info-row">
+                        <span>📧 Email</span>
+                        <span>{{ user.email }}</span>
+                    </div>
+
+                    <div class="info-row">
+                        <span>📱 Phone</span>
+                        <span>{{ user.phone or "Not added" }}</span>
+                    </div>
+
+                </div>
+
+                <!-- ADDRESS -->
+                <div class="mt-4">
+
+                    <h6 class="fw-bold mb-2">📍 Address</h6>
+
+                    {% if default_address %}
+
+                    <div class="border p-3 rounded bg-light">
+
+                        <div><strong>{{ default_address.full_name }}</strong></div>
+                        <div>{{ default_address.address_line }}</div>
+                        <div>{{ default_address.city }}, {{ default_address.state }}</div>
+                        <div>{{ default_address.pincode }}</div>
+                        <div>{{ default_address.phone }}</div>
+
+                    </div>
+
+
+
+                    {% else %}
+
+                    <div class="text-muted small mb-2">
+                        No address added
+                    </div>
+
+
+                    {% endif %}
+
+                </div>
+
+                <!-- ACTIONS -->
+                <div class="mt-4 d-grid gap-2">
+
+                    <a href="{{ url_for('auth.update_profile') }}" class="btn btn-outline-dark">
+                        ✏️ Edit Profile
+                    </a>
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+    ```
+
+</div>
+
+<style>
+    /* PROFILE CARD */
+    .profile-card {
+        background: #fff;
+        padding: 25px;
+        border-radius: 14px;
+        border: 1px solid #eee;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    /* AVATAR */
+    .profile-avatar {
+        width: 80px;
+        height: 80px;
+        background: #000;
+        color: #fff;
+        font-size: 30px;
+        border-radius: 50%;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        margin: auto;
+    }
+
+    /* INFO */
+    .profile-info {
+        border-top: 1px solid #eee;
+        padding-top: 15px;
+    }
+
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        font-size: 14px;
+    }
+
+    .info-row span:first-child {
+        color: #666;
+    }
+</style>
+
+{% endblock %}

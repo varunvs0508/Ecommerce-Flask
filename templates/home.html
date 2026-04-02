@@ -1,0 +1,404 @@
+{% extends "base.html" %}
+
+{% block title %}Home | CopVizz{% endblock %}
+
+{% block content %}
+
+<!-- 🔥 HERO SECTION -->
+
+<section class="hero-section d-flex align-items-center">
+    <div class="container text-center text-white">
+
+        <h1 class="fw-bold display-4 hero-title">
+            <span id="typing-text"></span>
+        </h1>
+
+        <p class="lead mt-3">
+            “Fashion is not just what you wear, it's how you express yourself.”
+        </p>
+
+        <a href="{{ url_for('product.products_page') }}" class="btn btn-light mt-3 px-4">
+            Shop Now
+        </a>
+
+    </div>
+
+
+</section>
+<!-- ✅ TRUST STRIP -->
+<section class="trust-strip py-3">
+    <div class="container d-flex justify-content-center gap-4 flex-wrap text-center">
+
+        <div class="trust-item">🔄 10 Days Return</div>
+        <div class="trust-item">🚚 Free Delivery</div>
+        <div class="trust-item">💳 Secure Payment</div>
+        <div class="trust-item">⭐ Premium Quality</div>
+
+    </div>
+</section>
+
+<!-- 🧭 CATEGORIES -->
+
+<section class="py-5">
+    <div class="container">
+
+        <h3 class="text-center mb-4 fw-bold">Shop by Category</h3>
+
+        <div class="row g-4">
+
+            {% set categories = [
+            ('Men', 'men.jpg'),
+            ('Women', 'women.jpg'),
+            ('Boys', 'boys.jpg'),
+            ('Girls', 'girls.jpg'),
+            ('Unisex', 'unisex.jpg'),
+            ('Accessories', 'Collection6.jpg')
+            ] %}
+
+            {% for name, img in categories %}
+
+            <div class="col-6 col-md-4 col-lg-2">
+
+                <a href="{{ url_for('product.category_page', gender=name) }}" class="text-decoration-none">
+
+                    <div class="category-card">
+
+                        <img src="{{ url_for('static', filename='images/' + img) }}" class="img-fluid">
+
+                        <div class="category-overlay">
+                            <h6>{{ name }}</h6>
+                        </div>
+
+                    </div>
+
+                </a>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+</section>
+
+<!-- 🔥 FEATURED PRODUCTS -->
+
+<section class="py-5 bg-light">
+
+    <div class="container">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="fw-bold">Trending Products</h3>
+            <a href="{{ url_for('product.products_page') }}" class="text-decoration-none">
+                View All →
+            </a>
+        </div>
+
+        <!-- SCROLL -->
+        <div class="scroll-row">
+
+            {% for p in featured_products %}
+
+            <div class="product-scroll-item">
+
+                <a href="{{ url_for('product.product_detail', product_id=p.id) }}" class="product-link">
+
+                    <div class="product-card">
+
+                        <div class="img-box">
+
+                            <img src="{{ url_for('static', filename=p.image_path) }}">
+
+                            <div class="top-icons">
+
+                                <a href="/wishlist/add/{{ p.id }}" class="icon-btn" onclick="event.stopPropagation();">
+                                    ❤️
+                                </a>
+
+                                <a href="/cart/add/{{ p.id }}" class="icon-btn" onclick="event.stopPropagation();">
+                                    🛒
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                        <div class="mt-2">
+
+                            <small class="category">
+                                {{ p.master_category }}
+                            </small>
+
+                            <div class="name">
+                                {{ p.product_display_name[:35] }}
+                            </div>
+
+                            <div class="price">
+                                {% if p.discount_price and p.discount_price < p.price %} ₹{{ p.discount_price }} <span
+                                    class="old">₹{{ p.price }}</span>
+                                    {% else %}
+                                    ₹{{ p.price }}
+                                    {% endif %}
+                            </div>
+
+                            <div class="rating">
+                                ⭐ {{ p.rating or "4.2" }}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </a>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+</section>
+
+<!-- 🎨 STYLES -->
+
+<style>
+    /* ===== TRUST STRIP PREMIUM ===== */
+    .trust-strip {
+        background: #fff;
+        margin-top: -30px;
+        /* overlap hero */
+        border-radius: 14px;
+        position: relative;
+        z-index: 2;
+
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+        padding: 12px 0;
+    }
+
+    .trust-item {
+        font-size: 14px;
+        font-weight: 500;
+        color: #333;
+
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        padding: 6px 12px;
+        border-radius: 8px;
+        transition: 0.2s;
+    }
+
+    /* Hover effect */
+    .trust-item:hover {
+        background: #f5f5f5;
+        transform: translateY(-2px);
+    }
+
+    /* Icon styling */
+    .trust-item span {
+        font-size: 18px;
+    }
+
+    /* Mobile spacing */
+    @media (max-width: 768px) {
+        .trust-strip {
+            gap: 10px;
+        }
+
+        .trust-item {
+            font-size: 13px;
+        }
+    }
+
+    /* HERO */
+    .hero-title::after {
+        content: "|";
+        animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+
+        0%,
+        50%,
+        100% {
+            opacity: 1;
+        }
+
+        25%,
+        75% {
+            opacity: 0;
+        }
+    }
+
+
+    .hero-section {
+        height: 70vh;
+        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+            url("https://images.unsplash.com/photo-1521335629791-ce4aec67dd53");
+        background-size: cover;
+        background-position: center;
+        border-radius: 12px;
+    }
+
+    /* CATEGORY */
+    .category-card {
+        position: relative;
+        overflow: hidden;
+        border-radius: 10px;
+        cursor: pointer;
+    }
+
+    .category-card img {
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+        transition: 0.3s;
+    }
+
+    .category-card:hover img {
+        transform: scale(1.1);
+    }
+
+    .category-overlay {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        color: white;
+        text-align: center;
+        padding: 10px;
+    }
+
+    /* PRODUCT */
+    .product-link {
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .product-card {
+        transition: 0.25s;
+    }
+
+    .product-card:hover {
+        transform: translateY(-4px);
+    }
+
+    .img-box {
+        position: relative;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .img-box img {
+        width: 100%;
+        height: 230px;
+        object-fit: cover;
+    }
+
+    .top-icons {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .icon-btn {
+        background: white;
+        padding: 6px 8px;
+        border-radius: 50%;
+        font-size: 14px;
+    }
+
+    .category {
+        font-size: 12px;
+        color: #888;
+    }
+
+    .name {
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .price {
+        font-weight: bold;
+    }
+
+    .old {
+        text-decoration: line-through;
+        font-size: 12px;
+        color: #888;
+        margin-left: 5px;
+    }
+
+    .rating {
+        font-size: 12px;
+        color: #f5a623;
+    }
+
+    /* SCROLL */
+    .scroll-row {
+        display: flex;
+        gap: 16px;
+        overflow-x: auto;
+        scroll-behavior: smooth;
+        padding-bottom: 10px;
+    }
+
+    .scroll-row::-webkit-scrollbar {
+        display: none;
+    }
+
+    .product-scroll-item {
+        min-width: 200px;
+        flex: 0 0 auto;
+    }
+</style>
+
+<!-- 🔥 TYPING SCRIPT -->
+
+<script>
+    const texts = [
+        "Discover Your Style_",
+        "Upgrade Your Fashion_",
+        "Find Your Perfect Outfit_",
+        "Express Yourself Through Style_"
+    ];
+
+    let index = 0;
+    let charIndex = 0;
+    let currentText = "";
+    let isDeleting = false;
+
+    function typeEffect() {
+        let fullText = texts[index];
+
+        if (isDeleting) {
+            currentText = fullText.substring(0, charIndex--);
+        } else {
+            currentText = fullText.substring(0, charIndex++);
+        }
+
+        document.getElementById("typing-text").innerHTML = currentText;
+
+        let speed = isDeleting ? 50 : 100;
+
+        if (!isDeleting && charIndex === fullText.length) {
+            isDeleting = true;
+            speed = 1200;
+        } else if (isDeleting && charIndex === 0) {
+            isDeleting = false;
+            index = (index + 1) % texts.length;
+        }
+
+        setTimeout(typeEffect, speed);
+    }
+
+    typeEffect();
+</script>
+
+{% endblock %}

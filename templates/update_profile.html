@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Update Profile | CopVizz{% endblock %}
+
+{% block content %}
+
+<div class="container my-5">
+
+    <div class="row justify-content-center">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold mb-0"></h4>
+
+            <a href="{{ url_for('auth.profile') }}" class="btn btn-outline-dark btn-sm">
+                ← Back
+            </a>
+        </div>
+
+        <div class="col-md-6">
+
+            <div class="profile-card">
+
+                <h4 class="fw-bold mb-3 text-center">Update Profile</h4>
+
+                <!-- FLASH MESSAGES -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% for category, message in messages %}
+
+                {% if category == "success" %}
+                <div class="alert alert-success">{{ message }}</div>
+                {% else %}
+                <div class="alert alert-danger">{{ message }}</div>
+                {% endif %}
+
+                {% endfor %}
+                {% endwith %}
+
+                <!-- FORM -->
+                <form method="POST">
+
+                    <div class="mb-3">
+                        <label class="form-label">Name</label>
+                        <input type="text" name="name" value="{{ user.name }}" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Phone</label>
+                        <input type="text" name="phone"
+                            value="{{ user.phone[3:] if user.phone and user.phone.startswith('+91') else '' }}"
+                            class="form-control" pattern="[0-9]{10}" maxlength="10" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-dark w-100">
+                        Update Profile
+                    </button>
+
+                </form>
+
+                <!-- ACTION BUTTONS -->
+                <div class="mt-4 d-grid gap-2">
+
+                    <a href="{{ url_for('auth.manage_addresses') }}" class="btn btn-outline-dark">
+                        📍 Manage Addresses
+                    </a>
+
+                    <a href="{{ url_for('auth.change_password') }}" class="btn btn-outline-dark">
+                        🔒 Change Password
+                    </a>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+    /* MATCH PROFILE STYLE */
+    .profile-card {
+        background: #fff;
+        padding: 25px;
+        border-radius: 14px;
+        border: 1px solid #eee;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+    }
+</style>
+
+{% endblock %}

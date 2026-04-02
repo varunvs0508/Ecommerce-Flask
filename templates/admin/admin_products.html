@@ -1,0 +1,212 @@
+{% extends "admin/admin_base.html" %}
+
+{% block admin_content %}
+
+<h2 class="admin-page-title">📦 Products</h2>
+
+<!-- 🔥 ADD PRODUCT -->
+<div class="card p-3 mb-4 shadow-sm rounded-4">
+    <h6 class="mb-3">Add Product</h6>
+
+    <form method="POST" action="{{ url_for('admin.add_product') }}">
+        <div class="row g-2">
+
+            <div class="col-md-4">
+                <input name="name" class="form-control" placeholder="Product Name" required>
+            </div>
+
+            <div class="col-md-3">
+                <input name="price" type="number" class="form-control" placeholder="Price" required>
+            </div>
+
+            <div class="col-md-3">
+                <input name="stock" type="number" class="form-control" placeholder="Stock" required>
+            </div>
+
+            <div class="col-md-2">
+                <button class="btn btn-dark w-100">Add</button>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+<!-- 🔥 LOW STOCK CARD -->
+<div class="low-stock-card mb-3" onclick="toggleLowStock()">
+
+    <div>
+        <strong>Low Stock</strong><br>
+        <span class="text-danger fs-5">
+            {{ low_stock_products|length }} items
+        </span>
+    </div>
+
+    <div class="fs-4">⚠️</div>
+
+</div>
+
+<!-- 🔽 LOW STOCK LIST -->
+<div id="lowStockBox" class="mb-4" style="display:none;">
+
+    {% if low_stock_products %}
+
+    {% for p in low_stock_products %}
+
+    <div class="low-item">
+
+        <div>
+            <b>{{ p.product_display_name }}</b><br>
+            <small class="text-danger">Stock: {{ p.stock }}</small>
+        </div>
+
+        <form method="POST" action="{{ url_for('admin.update_stock', product_id=p.id) }}" class="d-flex gap-2">
+
+            <input type="number" name="stock" class="form-control form-control-sm" placeholder="Add" required>
+
+            <button class="btn btn-success btn-sm">Update</button>
+
+        </form>
+
+    </div>
+
+    {% endfor %}
+
+    {% else %}
+    <p class="text-success">All products are well stocked ✅</p>
+    {% endif %}
+
+</div>
+
+<!-- 🧾 PRODUCT LIST -->
+<div class="row g-4">
+
+    {% for p in products.items %}
+
+    <div class="col-md-6 col-lg-4">
+
+        <div class="product-card">
+
+            <h6 class="mb-1">{{ p.product_display_name }}</h6>
+
+            <p class="mb-1 text-muted">₹{{ p.price }}</p>
+
+            <p class="mb-2">
+                Stock:
+                <span class="{% if p.stock < 10 %}text-danger{% else %}text-success{% endif %}">
+                    {{ p.stock }}
+                </span>
+            </p>
+
+            <form method="POST" action="{{ url_for('admin.delete_product', product_id=p.id) }}">
+
+                <button class="btn btn-danger btn-sm w-100">
+                    Delete
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+<!-- PAGINATION -->
+{% if products.pages > 1 %}
+
+<nav class="mt-4 d-flex justify-content-center">
+
+    <ul class="pagination">
+
+        {% if products.has_prev %}
+        <li class="page-item">
+            <a class="page-link" href="{{ url_for('admin.products', page=products.prev_num) }}">
+                Previous
+            </a>
+        </li>
+        {% endif %}
+
+        <li class="page-item disabled">
+            <span class="page-link">
+                Page {{ products.page }} of {{ products.pages }}
+            </span>
+        </li>
+
+        {% if products.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="{{ url_for('admin.products', page=products.next_num) }}">
+                Next
+            </a>
+        </li>
+        {% endif %}
+
+    </ul>
+
+</nav>
+
+{% endif %}
+
+<!-- 🎨 STYLE -->
+<style>
+    /* LOW STOCK CARD */
+    .low-stock-card {
+        background: white;
+        padding: 18px;
+        border-radius: 14px;
+
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        cursor: pointer;
+        transition: 0.25s;
+    }
+
+    .low-stock-card:hover {
+        transform: translateY(-4px);
+    }
+
+    /* LOW STOCK ITEM */
+    .low-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        padding: 12px;
+        margin-bottom: 10px;
+
+        background: white;
+        border-radius: 10px;
+
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    /* PRODUCT CARD */
+    .product-card {
+        background: white;
+        padding: 18px;
+        border-radius: 14px;
+
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+
+        transition: 0.25s;
+    }
+
+    .product-card:hover {
+        transform: translateY(-5px);
+    }
+</style>
+
+<!-- 🔥 JS -->
+<script>
+    function toggleLowStock() {
+        const box = document.getElementById("lowStockBox");
+        box.style.display = (box.style.display === "none") ? "block" : "none";
+    }
+</script>
+
+{% endblock %}

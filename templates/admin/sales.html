@@ -1,0 +1,132 @@
+{% extends "admin/admin_base.html" %}
+
+{% block admin_content %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<h2 class="admin-page-title">📊 Sales Dashboard</h2>
+
+<!-- KPI CARDS -->
+<div class="row g-4 mb-3">
+
+    <div class="col-md-3">
+        <div class="sales-card">
+            <small>Total Revenue</small>
+            <h5 class="text-primary">₹{{ total_revenue }}</h5>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="sales-card">
+            <small>Refunded</small>
+            <h5 class="text-danger">₹{{ refunded_amount }}</h5>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="sales-card">
+            <small>Total Orders</small>
+            <h5>{{ total_orders }}</h5>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="sales-card">
+            <small>Today</small>
+            <h5 class="text-success">₹{{ today_sales }}</h5>
+        </div>
+    </div>
+
+</div>
+
+<!-- LAST 7 DAYS -->
+<h5 class="mb-3">📅 Last 7 Days</h5>
+
+<div class="card p-3 mb-4">
+    <table class="table table-sm">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Revenue</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for d in days %}
+            <tr>
+                <td>{{ d }}</td>
+                <td>₹{{ day_revenue[loop.index0] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- CHARTS -->
+<div class="row g-4">
+
+    <!-- MONTHLY -->
+    <div class="col-lg-6">
+        <div class="card p-3">
+            <h6 class="mb-3">📈 Monthly Revenue</h6>
+            <canvas id="monthlyChart"></canvas>
+        </div>
+    </div>
+
+    <!-- PRODUCTS -->
+    <div class="col-lg-6">
+        <div class="card p-3">
+            <h6 class="mb-3">🏆 Top Products</h6>
+            <canvas id="productChart"></canvas>
+        </div>
+    </div>
+
+</div>
+
+<!-- 🎨 STYLE -->
+<style>
+    .sales-card {
+        background: white;
+        padding: 18px;
+        border-radius: 14px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+        transition: 0.25s;
+    }
+
+    .sales-card:hover {
+        transform: translateY(-5px);
+    }
+</style>
+
+<!-- CHART SCRIPT -->
+<script>
+
+    // Monthly Revenue
+    new Chart(document.getElementById('monthlyChart'), {
+        type: 'line',
+        data: {
+            labels: {{ months | tojson }},
+        datasets: [{
+            label: 'Revenue',
+            data: {{ revenue | tojson }},
+        borderWidth: 2,
+        tension: 0.3
+        }]
+    }
+});
+
+    // Top Products
+    new Chart(document.getElementById('productChart'), {
+        type: 'bar',
+        data: {
+            labels: {{ product_names | tojson }},
+        datasets: [{
+            label: 'Units Sold',
+            data: {{ quantities | tojson }},
+        borderWidth: 1
+        }]
+    }
+});
+
+</script>
+
+{% endblock %}

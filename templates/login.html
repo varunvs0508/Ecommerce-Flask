@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Login | CopVizz{% endblock %}
+
+{% block content %}
+
+<div class="auth-wrapper">
+
+  <div class="auth-card">
+
+    <h2 class="auth-title">Welcome Back 👋</h2>
+    <p class="auth-sub">Login to continue shopping</p>
+
+    <!-- Flash -->
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div class="alert alert-danger py-2">
+      {{ messages[-1] }}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <form method="POST">
+
+      <div class="auth-group">
+        <input type="email" name="email" required>
+        <label>Email</label>
+      </div>
+
+      <div class="auth-group password-box">
+        <input type="password" name="password" id="password" required>
+        <label>Password</label>
+        <span class="toggle-pass" onclick="togglePass('password')">👁️</span>
+      </div>
+
+      <div class="text-end mb-3">
+        <a href="{{ url_for('auth.password_reset_request') }}" class="small">
+          Forgot Password?
+        </a>
+      </div>
+
+      <button class="auth-btn">Login</button>
+
+    </form>
+
+    <p class="auth-footer">
+      Don’t have an account?
+      <a href="{{ url_for('auth.register') }}">Register</a>
+    </p>
+
+  </div>
+
+</div>
+
+{% endblock %}

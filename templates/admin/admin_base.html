@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Panel{% endblock %}
+
+{% block content %}
+
+<style>
+  /* ===== LAYOUT ===== */
+  .admin-container {
+    display: flex;
+    background: #f7f7f7;
+    min-height: calc(100vh - 140px);
+  }
+
+  /* ===== SIDEBAR ===== */
+  .admin-sidebar {
+    width: 240px;
+    margin: 15px;
+    padding: 20px 0;
+
+    background: #ffffff;
+    border-radius: 16px;
+
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+    position: sticky;
+    top: 80px;
+    height: fit-content;
+  }
+
+  /* LOGO */
+  .admin-logo {
+    padding: 0 20px 15px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 10px;
+
+    font-weight: 700;
+    font-size: 18px;
+    color: #111;
+  }
+
+  /* SECTION LABEL */
+  .admin-section-label {
+    padding: 10px 20px 5px;
+    font-size: 11px;
+    color: #aaa;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* LINKS */
+  .admin-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 10px 20px;
+    margin: 4px 10px;
+
+    color: #555;
+    font-size: 14px;
+    font-weight: 500;
+
+    border-radius: 10px;
+    text-decoration: none;
+
+    transition: all 0.2s ease;
+  }
+
+  /* HOVER */
+  .admin-nav-link:hover {
+    background: #f2f2f2;
+    color: #000;
+    transform: translateX(3px);
+  }
+
+  /* ACTIVE */
+  .admin-nav-link.active {
+    background: #000;
+    color: #fff;
+  }
+
+  /* ICON */
+  .admin-nav-link i {
+    font-size: 16px;
+  }
+
+  /* LOGOUT */
+  .admin-nav-link.logout {
+    color: #e74c3c;
+  }
+
+  .admin-nav-link.logout:hover {
+    background: #ffeaea;
+  }
+
+  /* ===== MAIN ===== */
+  .admin-main {
+    flex: 1;
+    padding: 20px;
+  }
+
+  /* PAGE TITLE */
+  .admin-page-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 20px;
+  }
+
+  /* MOBILE */
+  @media (max-width: 992px) {
+    .admin-sidebar {
+      display: none;
+    }
+  }
+</style>
+
+<div class="admin-container">
+
+  <!-- SIDEBAR -->
+  <div class="admin-sidebar">
+
+    <div class="admin-logo">
+      🛍 Admin Panel
+    </div>
+
+    <div class="admin-section-label">Overview</div>
+
+    <a href="{{ url_for('admin.admin_dashboard') }}"
+      class="admin-nav-link {% if request.endpoint == 'admin.dashboard' %}active{% endif %}">
+      <i class="bi bi-speedometer2"></i> Dashboard
+    </a>
+
+    <a href="{{ url_for('admin.sales_report') }}"
+      class="admin-nav-link {% if request.endpoint == 'admin.sales' %}active{% endif %}">
+      <i class="bi bi-graph-up"></i> Sales
+    </a>
+
+    <div class="admin-section-label">Manage</div>
+
+    <a href="{{ url_for('admin.all_orders') }}"
+      class="admin-nav-link {% if 'admin.order' in request.endpoint %}active{% endif %}">
+      <i class="bi bi-bag"></i> Orders
+    </a>
+
+    <a href="{{ url_for('admin.users') }}"
+      class="admin-nav-link {% if request.endpoint == 'admin.users' %}active{% endif %}">
+      <i class="bi bi-people"></i> Users
+    </a>
+
+    <a href="{{ url_for('admin.products') }}"
+      class="admin-nav-link {% if 'admin.product' in request.endpoint %}active{% endif %}">
+      <i class="bi bi-grid"></i> Products
+    </a>
+
+
+    <div class="admin-section-label"> </div>
+
+    <a href="{{ url_for('auth.logout') }}" class="admin-nav-link logout">
+      <i class="bi bi-box-arrow-right"></i> Logout
+    </a>
+
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="admin-main">
+
+    <!-- MOBILE NAV -->
+    <div class="d-flex d-lg-none gap-2 mb-3 flex-wrap">
+      <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-sm btn-dark">Dashboard</a>
+      <a href="{{ url_for('admin.sales_report') }}" class="btn btn-sm btn-dark">Sales</a>
+      <a href="{{ url_for('admin.all_orders') }}" class="btn btn-sm btn-dark">Orders</a>
+      <a href="{{ url_for('admin.users') }}" class="btn btn-sm btn-dark">Users</a>
+      <a href="{{ url_for('admin.products') }}" class="btn btn-sm btn-dark">Products</a>
+    </div>
+
+    {% block admin_content %}{% endblock %}
+
+  </div>
+
+</div>
+
+{% endblock %}

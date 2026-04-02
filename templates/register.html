@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Register | CopVizz{% endblock %}
+
+{% block content %}
+
+<div class="auth-wrapper">
+
+  <div class="auth-card large">
+
+    <h2 class="auth-title">Create Account 🚀</h2>
+    <p class="auth-sub">Join CopVizz today</p>
+
+    <!-- Flash -->
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div class="alert alert-danger py-2">
+      {% for message in messages %}
+      <div>{{ message }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <form method="POST">
+
+      <div class="auth-group">
+        <input type="text" name="name" value="{{ name or '' }}" required>
+        <label>Name</label>
+      </div>
+
+      <div class="auth-group">
+        <input type="email" name="email" value="{{ email or '' }}" required>
+        <label>Email</label>
+      </div>
+
+      <div class="auth-group">
+        <input type="text" name="phone" value="{{ phone or '' }}" pattern="[0-9]{10}" required>
+        <label>Phone</label>
+      </div>
+
+      <div class="auth-group">
+        <textarea name="address"></textarea>
+        <label>Address</label>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4">
+          <div class="auth-group">
+            <input type="text" name="city">
+            <label>City</label>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="auth-group">
+            <input type="text" name="state">
+            <label>State</label>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="auth-group">
+            <input type="text" name="pincode" pattern="[0-9]{6}">
+            <label>Pincode</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-group password-box">
+        <input type="password" name="password" id="password" required>
+        <label>Password</label>
+        <span class="toggle-pass" onclick="togglePass('password')">👁️</span>
+      </div>
+
+      <button class="auth-btn">Create Account</button>
+
+    </form>
+
+    <p class="auth-footer">
+      Already have an account?
+      <a href="{{ url_for('auth.login') }}">Login</a>
+    </p>
+
+  </div>
+
+</div>
+
+{% endblock %}

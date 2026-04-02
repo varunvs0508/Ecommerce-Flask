@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}{{ gender }} | CopVizz{% endblock %}
+
+{% block content %}
+
+<div class="container my-4">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <h3 class="fw-bold">{{ gender }} Collection</h3>
+
+        <form method="GET">
+            <input type="hidden" name="sub_category" value="{{ selected_sub }}">
+
+            <select name="sort" class="form-select form-select-sm" onchange="this.form.submit()">
+                <option value="">Sort</option>
+
+                <option value="price_asc" {% if request.args.get('sort')=='price_asc' %}selected{% endif %}>
+                    Price Low → High
+                </option>
+
+                <option value="price_desc" {% if request.args.get('sort')=='price_desc' %}selected{% endif %}>
+                    Price High → Low
+                </option>
+
+                <option value="newest" {% if request.args.get('sort')=='newest' %}selected{% endif %}>
+                    Newest
+                </option>
+            </select>
+        </form>
+    </div>
+
+    <div class="row">
+
+        <!-- SIDEBAR -->
+        <div class="col-md-3 mb-4">
+            <div class="category-sidebar">
+                <h6 class="fw-bold mb-3">Categories</h6>
+
+                <a href="/category/{{ gender }}" class="sub-link {% if not selected_sub %}active{% endif %}">
+                    All
+                </a>
+
+                {% for sub in subcategories %}
+                <a href="/category/{{ gender }}?sub_category={{ sub }}&sort={{ request.args.get('sort') }}"
+                    class="sub-link {% if selected_sub == sub %}active{% endif %}">
+                    {{ sub }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- PRODUCTS -->
+        <div class="col-md-9">
+
+            {% if products.items %}
+
+            <div class="row g-4">
+
+                {% for p in products.items %}
+                <div class="col-6 col-md-4 col-lg-3">
+
+                    <a href="{{ url_for('product.product_detail', product_id=p.id) }}">
+
+                        <div class="product-card">
+
+                            <div class="img-box">
+                                <img src="{{ url_for('static', filename=p.image_path) }}">
+
+                                <div class="top-icons">
+                                    <a href="/wishlist/add/{{ p.id }}" class="icon-btn"
+                                        onclick="event.stopPropagation();">❤️</a>
+                                    <a href="/cart/add/{{ p.id }}" class="icon-btn"
+                                        onclick="event.stopPropagation();">🛒</a>
+                                </div>
+                            </div>
+
+                            <div class="mt-2">
+                                <small class="category">{{ p.master_category }}</small>
+
+                                <div class="name">
+                                    {{ p.product_display_name[:35] }}
+                                </div>
+
+                                <div class="price">
+                                    {% if p.discount_price and p.discount_price < p.price %} ₹{{ p.discount_price }}
+                                        <span class="old">₹{{ p.price }}</span>
+                                        {% else %}
+                                        ₹{{ p.price }}
+                                        {% endif %}
+                                </div>
+
+                                <div class="rating">
+                                    ⭐ {{ p.rating or "4.2" }}
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </a>
+
+                </div>
+                {% endfor %}
+
+            </div>
+
+            <!-- PAGINATION -->
+            <div class="mt-5 d-flex justify-content-center gap-2 flex-wrap">
+
+                {% if products.has_prev %}
+                <a href="?page={{ products.prev_num }}{% if selected_sub %}&sub_category={{ selected_sub }}{% endif %}{% if request.args.get('sort') %}&sort={{ request.args.get('sort') }}{% endif %}"
+                    class="btn btn-outline-dark btn-sm">← Prev</a>
+                {% endif %}
+
+                {% for p in range(1, products.pages + 1) %}
+                {% if p == products.page %}
+                <span class="btn btn-dark btn-sm">{{ p }}</span>
+
+                {% elif p <= products.page + 2 and p>= products.page - 2 %}
+                    <a href="?page={{ p }}{% if selected_sub %}&sub_category={{ selected_sub }}{% endif %}{% if request.args.get('sort') %}&sort={{ request.args.get('sort') }}{% endif %}"
+                        class="btn btn-outline-dark btn-sm">{{ p }}</a>
+                    {% endif %}
+                    {% endfor %}
+
+                    {% if products.has_next %}
+                    <a href="?page={{ products.next_num }}{% if selected_sub %}&sub_category={{ selected_sub }}{% endif %}{% if request.args.get('sort') %}&sort={{ request.args.get('sort') }}{% endif %}"
+                        class="btn btn-outline-dark btn-sm">Next →</a>
+                    {% endif %}
+
+            </div>
+
+            {% else %}
+            <div class="text-center text-muted mt-5">
+                No products found
+            </div>
+            {% endif %}
+
+        </div>
+
+    </div>
+</div>
+
+<!-- ===== CSS ===== -->
+
+{% endblock %}

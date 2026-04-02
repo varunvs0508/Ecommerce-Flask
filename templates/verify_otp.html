@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="auth-wrapper">
+  <div class="auth-card">
+
+    <h2 class="auth-title">Verify Email ✉️</h2>
+
+    <!-- Flash -->
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div class="alert alert-danger">
+      {% for message in messages %}
+      <div>{{ message }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    {% if not email_verified %}
+
+    <!-- STEP 1: ENTER OTP -->
+    <form method="POST">
+
+      <div class="auth-group">
+        <input type="text" name="otp" required maxlength="6">
+        <label>Enter OTP</label>
+      </div>
+
+      <button type="submit" class="auth-btn">
+        Verify Email
+      </button>
+
+    </form>
+
+    <p class="auth-footer">
+      Didn't receive OTP?
+      <a href="{{ url_for('auth.resend_email_otp') }}">Resend</a>
+    </p>
+
+    {% else %}
+
+    <!-- STEP 2: CHOICE -->
+    <div class="text-center mt-4">
+
+      <h5>Email Verified 🎉</h5>
+      <p>Do you want to verify your mobile number?</p>
+
+      <div class="d-grid gap-3 mt-3">
+
+        <!-- VERIFY PHONE -->
+        <a href="{{ url_for('auth.start_phone_verification') }}" class="auth-btn">
+          Verify Mobile 📱
+        </a>
+
+        <!-- SKIP -->
+        <a href="{{ url_for('auth.complete_registration') }}" class="btn btn-outline-secondary">
+          Skip for now ⏭
+        </a>
+
+      </div>
+
+    </div>
+
+    {% endif %}
+
+  </div>
+</div>
+
+{% endblock %}

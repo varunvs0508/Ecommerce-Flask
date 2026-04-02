@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}Cart | CopVizz{% endblock %}
+
+{% block content %}
+
+<div class="container my-4">
+
+    <h3 class="fw-bold mb-4">My Cart</h3>
+
+    {% if items %}
+
+    <div class="row g-4">
+
+        {% for item in items %}
+
+        <div class="col-6 col-md-4 col-lg-5col">
+
+            <a href="{{ url_for('product.product_detail', product_id=item.product.id) }}">
+
+                <div class="product-card">
+
+                    <div class="img-box">
+                        <img src="{{ url_for('static', filename=item.product.image_path) }}">
+
+                        <!-- ICONS -->
+                        <div class="top-icons">
+
+                            <!-- REMOVE -->
+                            <a href="{{ url_for('cart.remove_from_cart', product_id=item.product.id) }}"
+                                class="icon-btn" onclick="event.stopPropagation();" title="remove from cart">
+                                ❌
+                            </a>
+
+                            <!-- ADD MORE
+                    <a href="{{ url_for('cart.increase_quantity', product_id=item.product.id) }}"
+                       class="icon-btn"
+                       onclick="event.stopPropagation();">
+                       ➕
+                    </a> -->
+
+                        </div>
+                    </div>
+
+                    <div class="mt-2">
+
+                        <small class="category">
+                            {{ item.product.master_category }}
+                        </small>
+
+                        <div class="name">
+                            {{ item.product.product_display_name[:35] }}
+                        </div>
+
+                        <div class="price">
+                            ₹{{ item.product.discount_price or item.product.price }}
+                            {% if item.product.discount_price %}
+                            <span class="old">₹{{ item.product.price }}</span>
+                            {% endif %}
+                        </div>
+
+                        <!-- QUANTITY CONTROLS -->
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+
+                            <div class="d-flex gap-2 align-items-center">
+
+                                <a href="{{ url_for('cart.decrease_quantity', product_id=item.product.id) }}"
+                                    class="btn btn-outline-dark btn-sm" onclick="event.stopPropagation();">−</a>
+
+                                <span>{{ item.quantity }}</span>
+
+                                <a href="{{ url_for('cart.increase_quantity', product_id=item.product.id) }}"
+                                    class="btn btn-outline-dark btn-sm" onclick="event.stopPropagation();">+</a>
+
+                            </div>
+
+                            <small>₹{{ item.subtotal }}</small>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </a>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    <!-- 💰 TOTAL + CHECKOUT -->
+    <div class="mt-5 p-3 border rounded d-flex justify-content-between align-items-center">
+
+        <h5>Total: ₹{{ total }}</h5>
+
+        <a href="{{ url_for('cart.checkout_page') }}" class="btn btn-dark">
+            Checkout →
+        </a>
+
+    </div>
+
+    <!-- 🔢 PAGINATION -->
+    <div class="mt-4 d-flex justify-content-center gap-2 flex-wrap">
+
+        {% if pagination.has_prev %}
+        <a href="{{ url_for('cart.view_cart', page=pagination.prev_num) }}" class="btn btn-outline-dark btn-sm">←</a>
+        {% endif %}
+
+        {% for p in range(1, pagination.pages + 1) %}
+        {% if p == pagination.page %}
+        <span class="btn btn-dark btn-sm">{{ p }}</span>
+        {% else %}
+        <a href="{{ url_for('cart.view_cart', page=p) }}" class="btn btn-outline-dark btn-sm">{{ p }}</a>
+        {% endif %}
+        {% endfor %}
+
+        {% if pagination.has_next %}
+        <a href="{{ url_for('cart.view_cart', page=pagination.next_num) }}" class="btn btn-outline-dark btn-sm">→</a>
+        {% endif %}
+
+    </div>
+
+    {% else %}
+
+    <div class="text-center mt-5"
+        style="min-height:50vh; display:flex; align-items:center; justify-content:center; flex-direction:column;">
+
+        <h5>Your cart is empty</h5>
+
+        <a href="{{ url_for('product.products_page') }}" class="btn btn-dark mt-3">
+            Start Shopping
+        </a>
+
+    </div>
+
+    {% endif %}
+
+</div>
+<style>
+    @media (min-width: 992px) {
+        .col-lg-5col {
+            width: 20%;
+            flex: 0 0 20%;
+            max-width: 20%;
+        }
+    }
+</style>
+{% endblock %}

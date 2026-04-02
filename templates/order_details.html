@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block title %}Order Details | CopVizz{% endblock %}
+
+{% block content %}
+
+<div class="container my-5">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold mb-0">Order #{{ order.id }}</h4>
+
+        <a href="{{ url_for('cart.orders_page') }}" class="btn btn-outline-dark btn-sm">
+            ← Back to Orders
+        </a>
+    </div>
+
+    <!-- ORDER INFO -->
+    <div class="order-box mb-4">
+
+        <div class="small text-muted mb-2">
+            Placed on {{ order.created_at.strftime('%d %b %Y') }}
+        </div>
+
+        <div class="mb-2">
+            <strong>Payment ID:</strong> {{ order.payment_id }} <br>
+            <strong>Payment Status:</strong> {{ order.payment_status }} <br>
+            <strong>Payment Method:</strong> {{ order.payment_method }}
+        </div>
+
+        <!-- 🔥 TIMELINE -->
+        {% if order.status == "cancelled" %}
+        <div class="text-danger fw-semibold">
+            Order Cancelled ❌
+        </div>
+        {% else %}
+        <div class="timeline">
+
+            {% for step in status_steps %}
+            <div class="step
+                {% if step == order.status %}active{% endif %}
+                {% if status_steps.index(step) < status_steps.index(order.status) %}done{% endif %}
+            ">
+                {{ step.capitalize() }}
+            </div>
+            {% endfor %}
+
+        </div>
+        {% endif %}
+
+        <div class="mt-2">
+            <strong>Status:</strong> {{ order.status }}
+        </div>
+
+        <!-- ADDRESS -->
+        <div class="mt-3 small text-muted">
+            <strong>Shipping Address:</strong><br>
+            {{ order.name }}<br>
+            {{ order.address }}<br>
+            {{ order.city }}, {{ order.state }} - {{ order.pincode }}<br>
+            Phone: {{ order.phone }}
+        </div>
+
+    </div>
+
+    <!-- ITEMS -->
+    <div class="order-box">
+
+        <h6 class="fw-semibold mb-3">Items</h6>
+
+        {% for item in items %}
+
+        <div class="item-row">
+
+            <div class="d-flex align-items-center gap-3">
+
+                <img src="{{ url_for('static', filename=item.product.image_path) }}" class="item-img">
+
+                <div>
+                    {{ item.product.product_display_name }} <br>
+                    <small class="text-muted">Qty: {{ item.quantity }}</small>
+                </div>
+
+            </div>
+
+            <div class="fw-semibold">
+                ₹{{ "%.2f"|format(item.subtotal) }}
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+        <div class="total mt-3">
+            Total: ₹{{ "%.2f"|format(order.total_amount) }}
+        </div>
+
+    </div>
+
+
+</div>
+
+<style>
+    /* BOX */
+    .order-box {
+        background: #fff;
+        padding: 18px;
+        border-radius: 12px;
+        border: 1px solid #eee;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    /* TIMELINE */
+    .timeline {
+        display: flex;
+        justify-content: space-between;
+        margin: 20px 0;
+    }
+
+    .step {
+        flex: 1;
+        text-align: center;
+        padding: 8px;
+        border-bottom: 3px solid #ccc;
+        font-size: 13px;
+    }
+
+    .step.done {
+        border-color: green;
+        color: green;
+    }
+
+    .step.active {
+        border-color: orange;
+        color: orange;
+        font-weight: 600;
+    }
+
+    /* ITEMS */
+    .item-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #eee;
+        padding: 10px 0;
+    }
+
+    .item-img {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+    /* TOTAL */
+    .total {
+        font-size: 16px;
+        font-weight: bold;
+    }
+</style>
+
+{% endblock %}

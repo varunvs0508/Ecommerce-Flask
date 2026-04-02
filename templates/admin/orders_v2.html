@@ -1,0 +1,166 @@
+{% extends "admin/admin_base.html" %}
+{% block title %}Admin — Orders{% endblock %}
+
+{% block admin_css %}
+<style>
+  .data-table {
+    width: 100%;
+  }
+
+  .data-table th {
+    background: #f8f4ef;
+    font-size: .78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: .65rem 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .data-table td {
+    padding: .8rem 1rem;
+    font-size: .86rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .data-table tr:hover td {
+    background: #fafaf8;
+  }
+
+  .table-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .badge-status {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: .75rem;
+    font-weight: 600;
+  }
+
+  .status-placed {
+    background: #fff3cd;
+    color: #856404;
+  }
+
+  .status-shipped {
+    background: #cce5ff;
+    color: #004085;
+  }
+
+  .status-delivered {
+    background: #d4edda;
+    color: #155724;
+  }
+
+  .status-cancelled {
+    background: #f8d7da;
+    color: #721c24;
+  }
+
+  .status-refunded {
+    background: #e2e3e5;
+    color: #383d41;
+  }
+</style>
+{% endblock %}
+
+{% block admin_content %}
+
+<div class="admin-page-title mb-4">Orders (New UI)</div>
+
+<div class="table-card">
+  <div class="table-responsive">
+
+    <table class="data-table">
+
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Amount</th>
+          <th>Payment</th>
+          <th>Status</th>
+          <th>Refund</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+
+        {% for o in orders.items %}
+        <tr>
+
+          <td>#{{ o.id }}</td>
+
+          <td class="fw-700">₹{{ o.total_amount }}</td>
+
+          <td>{{ o.payment_method }}</td>
+
+          <td>
+            <span class="badge-status status-{{ o.status }}">
+              {{ o.status }}
+            </span>
+          </td>
+
+          <td>
+            {% if o.refund_status == "requested" %}
+            <span class="text-warning">Requested</span>
+            {% elif o.refund_status == "processed" %}
+            <span class="text-success">Done</span>
+            {% else %}
+            <span class="text-muted">—</span>
+            {% endif %}
+          </td>
+
+          <td>
+
+            {% if o.status != "refunded" %}
+            <form method="POST" action="{{ url_for('admin.update_order', order_id=o.id) }}" class="d-flex gap-2 mb-1">
+
+              <select name="status" class="form-select form-select-sm">
+                <option value="placed">placed</option>
+                <option value="shipped">shipped</option>
+                <option value="delivered">delivered</option>
+                <option value="cancelled">cancelled</option>
+              </select>
+
+              <button class="btn btn-sm btn-dark">Update</button>
+            </form>
+            {% endif %}
+
+            {% if o.refund_status == "requested" %}
+            <form method="POST" action="{{ url_for('admin.approve_refund', order_id=o.id) }}">
+              <button class="btn btn-sm btn-success w-100">Approve</button>
+            </form>
+            {% endif %}
+
+          </td>
+
+        </tr>
+        {% endfor %}
+
+      </tbody>
+
+    </table>
+
+  </div>
+</div>
+
+<!-- PAGINATION -->
+<div class="mt-4 text-center">
+
+  {% if orders.has_prev %}
+  <a href="{{ url_for('admin.orders_v2', page=orders.prev_num) }}">Prev</a>
+  {% endif %}
+
+  Page {{ orders.page }} / {{ orders.pages }}
+
+  {% if orders.has_next %}
+  <a href="{{ url_for('admin.orders_v2', page=orders.next_num) }}">Next</a>
+  {% endif %}
+
+</div>
+
+{% endblock %}

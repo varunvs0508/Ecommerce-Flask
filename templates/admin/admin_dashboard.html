@@ -1,0 +1,177 @@
+{% extends "admin/admin_base.html" %}
+
+{% block admin_content %}
+
+<h2 class="admin-page-title">📊 Dashboard</h2>
+
+<!-- STATS CARDS -->
+<div class="row g-4">
+
+  <div class="col-md-3">
+    <div class="dash-card">
+      <h6>Total Users</h6>
+      <h3>{{ total_users }}</h3>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="dash-card">
+      <h6>Total Products</h6>
+      <h3>{{ total_products }}</h3>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="dash-card">
+      <h6>Total Orders</h6>
+      <h3>{{ total_orders }}</h3>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="dash-card">
+      <h6>Total Revenue</h6>
+      <h3>₹{{ total_revenue }}</h3>
+    </div>
+  </div>
+
+</div>
+
+<!-- RECENT ORDERS -->
+<div class="recent-orders mt-5">
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="fw-bold">Recent Orders</h5>
+    <a href="{{ url_for('admin.all_orders') }}" class="view-all">View All →</a>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table align-middle">
+
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>User</th>
+          <th>Amount</th>
+          <th>Status</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+
+      <tbody>
+
+        {% for order in recent_orders %}
+        <tr>
+          <td>#{{ order.id }}</td>
+          <td>{{ order.user.name if order.user else "User" }}</td>
+          <td>₹{{ order.total_amount }}</td>
+
+          <td>
+            <span class="status {{ order.status }}">
+              {{ order.status }}
+            </span>
+          </td>
+
+          <td>{{ order.created_at.strftime('%d %b %Y') }}</td>
+        </tr>
+        {% endfor %}
+
+      </tbody>
+
+    </table>
+  </div>
+
+</div>
+
+<!-- STYLES -->
+<style>
+  /* DASH CARDS */
+  .dash-card {
+    background: white;
+    padding: 20px;
+    border-radius: 14px;
+
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+
+    transition: 0.25s;
+  }
+
+  .dash-card:hover {
+    transform: translateY(-5px);
+  }
+
+  .dash-card h6 {
+    font-size: 13px;
+    color: #888;
+  }
+
+  .dash-card h3 {
+    font-weight: 700;
+    margin-top: 5px;
+  }
+
+  /* TABLE */
+  .recent-orders {
+    background: white;
+    padding: 20px;
+    border-radius: 14px;
+
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+  }
+
+  .table th {
+    font-size: 13px;
+    color: #777;
+  }
+
+  .table td {
+    font-size: 14px;
+  }
+
+  /* STATUS BADGES */
+  .status {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    text-transform: capitalize;
+  }
+
+  /* COLORS */
+  .status.placed {
+    background: #fff3cd;
+    color: #856404;
+  }
+
+  .status.shipped {
+    background: #d1ecf1;
+    color: #0c5460;
+  }
+
+  .status.delivered {
+    background: #d4edda;
+    color: #155724;
+  }
+
+  .status.cancelled {
+    background: #f8d7da;
+    color: #721c24;
+  }
+
+  .status.refunded {
+    background: #eee;
+    color: #555;
+  }
+
+  /* VIEW ALL */
+  .view-all {
+    text-decoration: none;
+    font-size: 14px;
+    color: #000;
+  }
+
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+{% endblock %}

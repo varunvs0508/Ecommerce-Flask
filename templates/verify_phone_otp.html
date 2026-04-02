@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Verify Phone | CopVizz{% endblock %}
+
+{% block content %}
+
+<div class="auth-wrapper">
+
+  <div class="auth-card">
+
+    <h2 class="auth-title">Verify Mobile 📱</h2>
+    <p class="auth-sub">Enter the OTP sent to your phone</p>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div class="alert alert-danger py-2">
+      {% for message in messages %}
+      <div>{{ message }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <form method="POST">
+
+      <div class="auth-group">
+        <input type="text" name="otp" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" required>
+        <label>Enter OTP</label>
+      </div>
+
+      <button type="submit" class="auth-btn">
+        Verify Phone
+      </button>
+
+    </form>
+
+  </div>
+
+</div>
+
+{% endblock %}

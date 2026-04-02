@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout{% endblock %}
+
+{% block content %}
+
+<div class="container my-4">
+
+    <h4 class="fw-bold mb-3">Checkout</h4>
+
+    <form method="POST" action="{{ url_for('cart.place_order') }}">
+
+        <div class="row g-4">
+
+            <!-- LEFT -->
+            <div class="col-md-8">
+
+                <!-- ADDRESS -->
+                <div class="card p-3 mb-3">
+
+                    <h6>Select Address</h6>
+
+                    {% for addr in addresses %}
+                    <label class="d-block border p-2 mb-2 rounded">
+                        <input type="radio" name="address_id" value="{{ addr.id }}" {% if addr.is_default %}checked{%
+                            endif %} required>
+
+                        <div>
+                            <b>{{ addr.full_name }}</b><br>
+                            {{ addr.address_line }}, {{ addr.city }}<br>
+                            {{ addr.state }} - {{ addr.pincode }}
+                        </div>
+                    </label>
+                    {% endfor %}
+
+                    <label class="mt-2">
+                        <input type="radio" name="address_id" value="new"> Add New Address
+                    </label>
+
+                </div>
+
+                <!-- NEW ADDRESS -->
+                <div class="card p-3 mb-3" id="newAddressBox">
+
+                    <input name="name" placeholder="Full Name" class="form-control mb-2" required>
+                    <input name="phone" placeholder="Phone" class="form-control mb-2" required pattern="[0-9]{10}"
+                        maxlength="10" title="Enter valid 10 digit phone number">
+                    <textarea name="address" placeholder="Address" class="form-control mb-2" required></textarea>
+                    <input name="city" placeholder="City" class="form-control mb-2" required>
+                    <input name="state" placeholder="State" class="form-control mb-2" required>
+                    <input name="pincode" placeholder="Pincode" class="form-control mb-2" required>
+
+                </div>
+
+                <!-- PAYMENT -->
+                <div class="card p-3">
+
+                    <h6>Payment Method</h6>
+
+                    <label class="d-block">
+                        <input type="radio" name="payment_method" value="cod" checked>
+                        Cash on Delivery
+                    </label>
+
+                    <label class="d-block">
+                        <input type="radio" name="payment_method" value="razorpay">
+                        Pay Online
+                    </label>
+
+                </div>
+
+            </div>
+
+            <!-- RIGHT -->
+            <div class="col-md-4">
+
+                <div class="card p-3">
+
+                    <h6>Order Summary</h6>
+
+                    {% for item in items %}
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+
+                        <!-- LEFT: IMAGE + DETAILS -->
+                        <div class="d-flex align-items-center gap-2">
+
+                            <img src="{{ url_for('static', filename=item.product.image_path) }}"
+                                style="width:50px; height:50px; object-fit:contain; border-radius:6px; background:#f5f5f5;">
+
+                            <div>
+                                <div style="font-size:14px;">
+                                    {{ item.product.product_display_name[:30] }}
+                                </div>
+                                <small class="text-muted">Qty: {{ item.quantity }}</small>
+                            </div>
+
+                        </div>
+
+                        <!-- RIGHT: PRICE -->
+                        <div style="font-weight:500;">
+                            ₹{{ item.subtotal }}
+                        </div>
+
+                    </div>
+                    {% endfor %}
+
+                    <hr>
+
+                    <div class="d-flex justify-content-between">
+                        <b>Total</b>
+                        <b>₹{{ total }}</b>
+                    </div>
+
+
+                </div>
+                <button type="button" onclick="handlePayment()" class="btn btn-dark w-100 mt-3">
+                    Place Order
+                </button>
+
+            </div>
+
+        </div>
+
+    </form>
+
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    document.querySelectorAll('input[name="address_id"]').forEach(r => {
+        r.addEventListener("change", function () {
+            document.getElementById("newAddressBox").style.display =
+                (this.value === "new") ? "block" : "none";
+        });
+    });
+
+    document.getElementById("newAddressBox").style.display = "none";
+    function handlePayment() {
+
+        let method = document.querySelector('input[name="payment_method"]:checked').value;
+
+        if (method === "cod") {
+            document.querySelector("form").submit();
+        } else {
+            startRazorpayPayment();
+        }
+    }
+
+    function startRazorpayPayment() {
+
+        var options = {
+            "key": "{{ razorpay_key }}",
+            "amount": "{{ razorpay_order.amount }}",
+            "currency": "INR",
+            "name": "Test Store",
+            "description": "Test Payment",
+            "order_id": "{{ razorpay_order.id }}",
+
+            "handler": function (response) {
+
+                // ✅ GET SELECTED ADDRESS
+
+                // ✅ GET SELECTED ADDRESS
+                const addressId = document.querySelector('input[name="address_id"]:checked').value;
+
+                // 🔥 CREATE PAYLOAD
+                let payload = {
+                    razorpay_order_id: response.razorpay_order_id,
+                    razorpay_payment_id: response.razorpay_payment_id,
+                    razorpay_signature: response.razorpay_signature,
+                    address_id: addressId
+                };
+
+                // 🔥 IF NEW ADDRESS → SEND FULL DATA
+                if (addressId === "new") {
+                    payload.name = document.querySelector('input[name="name"]').value;
+                    payload.phone = document.querySelector('input[name="phone"]').value;
+                    payload.address = document.querySelector('textarea[name="address"]').value;
+                    payload.city = document.querySelector('input[name="city"]').value;
+                    payload.state = document.querySelector('input[name="state"]').value;
+                    payload.pincode = document.querySelector('input[name="pincode"]').value;
+                }
+
+                // ✅ SEND TO BACKEND
+                fetch("/verify-payment", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(payload)
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            window.location.href = "/orders";
+                        } else {
+                            alert("Payment Failed: " + (data.message || ""));
+                        }
+                    });
+            }
+        };
+
+        var rzp = new Razorpay(options);
+        rzp.open();
+    }
+</script>
+</body>
+
+</html>
+
+
+{% endblock %}
