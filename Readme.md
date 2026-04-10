@@ -25,7 +25,7 @@ A production-ready **full-stack E-commerce Web Application** built using **Flask
 
 ## 🚀 Live Demo
 
-👉 http://3.111.29.84
+👉 http://43.204.108.20
 
 ⚠️ Hosted on AWS EC2 (may take a few seconds to load if instance is idle)
 
